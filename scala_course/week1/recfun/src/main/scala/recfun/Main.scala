@@ -27,7 +27,17 @@ object Main {
   /**
    * Exercise 2
    */
-    def balance(chars: List[Char]): Boolean = ???
+    def balance(chars: List[Char]): Boolean = {
+      def balanceInner(chars: List[Char], counter: Int): Boolean = {
+        chars match {
+          case Nil => true
+          case '(' :: xs => balanceInner(xs, counter + 1)
+          case ')' :: xs => (counter != 0) && balanceInner(xs, counter - 1)
+          case _   :: xs => balanceInner(xs, counter)
+        }
+      }
+      balanceInner(chars, 0)
+    }
   
   /**
    * Exercise 3
