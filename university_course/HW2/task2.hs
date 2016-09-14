@@ -11,5 +11,5 @@ myf n = c
 nseq n = myf n !! n  !! n
 
 main = do
-     let c = nseq 9
+     let c = nseq 11
      putStrLn $ show c 
