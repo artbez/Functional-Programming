@@ -131,7 +131,7 @@ class FunSetSuite extends FunSuite {
     }
   }
 
-  test("filter return a subset of a set which elements are satisfied by a predicate") {
+  test("filter returns a subset of a set which elements are satisfied by a predicate") {
     new TestSets {
       val s = union(s1, s2)
       val t = filter (s, (x: Int) => x > 1)
@@ -139,6 +139,36 @@ class FunSetSuite extends FunSuite {
       assert(contains(t, 2), "filter 2")
     }
   }
+
+  test("forall elements must be true if all elements are satisfied by predicate") {
+    new TestSets {
+      val s = union(s1, s2)
+      assert(forall(s, x => x > 0), "forall 1")
+      assert(!forall(s, x => x > 1), "forall 2")
+    }
+  }
+
+  test("exists must be true if there exist an element which is satisfied by predicate") {
+    new TestSets {
+      val s = union(s1, s2)
+      assert(exists(s, x => x > 0), "exist 1")
+      assert(exists(s, x => x > 1), "exist 2")
+      assert(!exists(s, x => x < 0), "exist 3")
+    }
+  }
+
+  test("map creates a new set with f(a) elements for any a in previous set") {
+    new TestSets {
+      val s = union(s1, s2)
+      val m = map(s, x => x * x)
+      assert(contains(m, 1), "map 1")
+      assert(contains(m, 4), "map 2")
+      assert(!contains(m, 2), "map 3")
+    }
+  }
+
+
+
 
 
 
