@@ -1,0 +1,1 @@
+sumprod l = foldr (\x acc -> (fst x) * (snd x) + acc) 0 (zip l (tail l))
