@@ -78,7 +78,7 @@ object Huffman {
 
     def times(chars: List[Char]): List[(Char, Int)] = chars match {
       case List() => List()
-      case l1 :: ls => (l1, chars.count(ch => ch == l1) + 1) :: times(ls.filter(ch => ch != l1))
+      case l1 :: ls => (l1, chars.count(ch => ch == l1)) :: times(ls.filter(ch => ch != l1))
     }
 
   def insert[T <: CodeTree](leaf: T, leafs: List[T]): List[T] = leafs match {
@@ -200,7 +200,7 @@ object Huffman {
    */
     def encode(tree: CodeTree)(text: List[Char]): List[Bit] = {
       def coder(ch: Char, tree: CodeTree): List[Bit] = tree match {
-        case Leaf(curChar, _) => if (ch == curChar) List() else throw new Error()
+        case Leaf(curChar, _) => if (ch == curChar) List() else throw new Error("HEHEHE")
         case Fork(left, right, _, _) =>
           if (chars(left).contains(ch)) 0 :: coder(ch, left) else 1 :: coder(ch, right)
       }
