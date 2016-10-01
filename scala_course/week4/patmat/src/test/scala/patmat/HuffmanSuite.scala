@@ -57,4 +57,7 @@ class HuffmanSuite extends FunSuite {
     }
   }
 
+  test("quick correct") {
+    assert(quickEncode(frenchCode) (decodedSecret) === secret)
+  }
 }
