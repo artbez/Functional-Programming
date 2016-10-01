@@ -26,12 +26,12 @@ object Huffman {
   // Part 1: Basics
     def weight(tree: CodeTree): Int = tree match {
       case Leaf(_, curWeight: Int) => curWeight
-      case Fork(left: CodeTree, right: CodeTree, _, _) => weight(left) + weight(right)
+      case Fork(_, _, _, curWeight) => curWeight
     }
   
     def chars(tree: CodeTree): List[Char] = tree match {
       case Leaf(char: Char, _) => List(char)
-      case Fork(left: CodeTree, right: CodeTree, _, _) => chars(left) ::: chars(right)
+      case Fork(_, _, curChars, _) => curChars
     }
   
   def makeCodeTree(left: CodeTree, right: CodeTree) =
@@ -47,91 +47,110 @@ object Huffman {
    */
   def string2Chars(str: String): List[Char] = str.toList
 
-  /**
-   * This function computes for each unique character in the list `chars` the number of
-   * times it occurs. For example, the invocation
-   *
-   *   times(List('a', 'b', 'a'))
-   *
-   * should return the following (the order of the resulting list is not important):
-   *
-   *   List(('a', 2), ('b', 1))
-   *
-   * The type `List[(Char, Int)]` denotes a list of pairs, where each pair consists of a
-   * character and an integer. Pairs can be constructed easily using parentheses:
-   *
-   *   val pair: (Char, Int) = ('c', 1)
-   *
-   * In order to access the two elements of a pair, you can use the accessors `_1` and `_2`:
-   *
-   *   val theChar = pair._1
-   *   val theInt  = pair._2
-   *
-   * Another way to deconstruct a pair is using pattern matching:
-   *
-   *   pair match {
-   *     case (theChar, theInt) =>
-   *       println("character is: "+ theChar)
-   *       println("integer is  : "+ theInt)
-   *   }
-   */
-    def times(chars: List[Char]): List[(Char, Int)] = ???
-  
-  /**
-   * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
-   *
-   * The returned list should be ordered by ascending weights (i.e. the
-   * head of the list should have the smallest weight), where the weight
-   * of a leaf is the frequency of the character.
-   */
-    def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = ???
-  
-  /**
-   * Checks whether the list `trees` contains only one single code tree.
-   */
-    def singleton(trees: List[CodeTree]): Boolean = ???
-  
-  /**
-   * The parameter `trees` of this function is a list of code trees ordered
-   * by ascending weights.
-   *
-   * This function takes the first two elements of the list `trees` and combines
-   * them into a single `Fork` node. This node is then added back into the
-   * remaining elements of `trees` at a position such that the ordering by weights
-   * is preserved.
-   *
-   * If `trees` is a list of less than two elements, that list should be returned
-   * unchanged.
-   */
-    def combine(trees: List[CodeTree]): List[CodeTree] = ???
-  
-  /**
-   * This function will be called in the following way:
-   *
-   *   until(singleton, combine)(trees)
-   *
-   * where `trees` is of type `List[CodeTree]`, `singleton` and `combine` refer to
-   * the two functions defined above.
-   *
-   * In such an invocation, `until` should call the two functions until the list of
-   * code trees contains only one single tree, and then return that singleton list.
-   *
-   * Hint: before writing the implementation,
-   *  - start by defining the parameter types such that the above example invocation
-   *    is valid. The parameter types of `until` should match the argument types of
-   *    the example invocation. Also define the return type of the `until` function.
-   *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
-   */
-    def until(xxx: ???, yyy: ???)(zzz: ???): ??? = ???
-  
-  /**
-   * This function creates a code tree which is optimal to encode the text `chars`.
-   *
-   * The parameter `chars` is an arbitrary text. This function extracts the character
-   * frequencies from that text and creates a code tree based on them.
-   */
-    def createCodeTree(chars: List[Char]): CodeTree = ???
-  
+   /**
+      * This function computes for each unique character in the list `chars` the number of
+      * times it occurs. For example, the invocation
+      *
+      * times(List('a', 'b', 'a'))
+      *
+      * should return the following (the order of the resulting list is not important):
+      *
+      * List(('a', 2), ('b', 1))
+      *
+      * The type `List[(Char, Int)]` denotes a list of pairs, where each pair consists of a
+      * character and an integer. Pairs can be constructed easily using parentheses:
+      *
+      * val pair: (Char, Int) = ('c', 1)
+      *
+      * In order to access the two elements of a pair, you can use the accessors `_1` and `_2`:
+      *
+      * val theChar = pair._1
+      * val theInt  = pair._2
+      *
+      * Another way to deconstruct a pair is using pattern matching:
+      *
+      * pair match {
+      * case (theChar, theInt) =>
+      * println("character is: "+ theChar)
+      * println("integer is  : "+ theInt)
+      * }
+      */
+
+    def times(chars: List[Char]): List[(Char, Int)] = chars match {
+      case List() => List()
+      case l1 :: ls => (l1, chars.count(ch => ch == l1) + 1) :: times(ls.filter(ch => ch != l1))
+    }
+
+  def insert[T <: CodeTree](leaf: T, leafs: List[T]): List[T] = leafs match {
+    case List() => List(leaf)
+    case l1 :: ls =>
+      if (weight(leaf) < weight(l1)) leaf :: leafs else l1 :: insert(leaf, ls)
+  }
+    /**
+      * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
+      *
+      * The returned list should be ordered by ascending weights (i.e. the
+      * head of the list should have the smallest weight), where the weight
+      * of a leaf is the frequency of the character.
+      */
+    def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = {
+
+      freqs match {
+        case List() => List()
+        case l1 :: ls => insert(Leaf(l1._1, l1._2), makeOrderedLeafList(ls))
+      }
+    }
+
+    /**
+      * Checks whether the list `trees` contains only one single code tree.
+      */
+    def singleton(trees: List[CodeTree]): Boolean = trees.length == 1
+
+    /**
+      * The parameter `trees` of this function is a list of code trees ordered
+      * by ascending weights.
+      *
+      * This function takes the first two elements of the list `trees` and combines
+      * them into a single `Fork` node. This node is then added back into the
+      * remaining elements of `trees` at a position such that the ordering by weights
+      * is preserved.
+      *
+      * If `trees` is a list of less than two elements, that list should be returned
+      * unchanged.
+      */
+    def combine(trees: List[CodeTree]): List[CodeTree] = trees match {
+      case List() => List()
+      case List(l1) => List(l1)
+      case l1 :: l2 :: ls => insert(makeCodeTree(l1, l2), ls)
+    }
+
+    /**
+      * This function will be called in the following way:
+      *
+      * until(singleton, combine)(trees)
+      *
+      * where `trees` is of type `List[CodeTree]`, `singleton` and `combine` refer to
+      * the two functions defined above.
+      *
+      * In such an invocation, `until` should call the two functions until the list of
+      * code trees contains only one single tree, and then return that singleton list.
+      *
+      * Hint: before writing the implementation,
+      *  - start by defining the parameter types such that the above example invocation
+      * is valid. The parameter types of `until` should match the argument types of
+      * the example invocation. Also define the return type of the `until` function.
+      *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
+      */
+    def until(xxx: List[CodeTree] => Boolean, yyy: List[CodeTree] => List[CodeTree])(zzz: List[CodeTree]): CodeTree =
+      if (xxx(zzz)) until(xxx, yyy) (yyy(zzz)) else zzz.head
+
+    /**
+      * This function creates a code tree which is optimal to encode the text `chars`.
+      *
+      * The parameter `chars` is an arbitrary text. This function extracts the character
+      * frequencies from that text and creates a code tree based on them.
+      */
+    def createCodeTree(chars: List[Char]): CodeTree = until(singleton, combine) (makeOrderedLeafList(times (chars)))
 
   // Part 3: Decoding
 

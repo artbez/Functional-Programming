@@ -39,6 +39,12 @@ class HuffmanSuite extends FunSuite {
   }
 
 
+  test("insert to list") {
+    val leaflist = List(Leaf('e', 1), Leaf('t', 2), Leaf('x', 4))
+    val ins = Fork(Leaf('k', 3), Leaf('s', 2), List('k', 's'), 5)
+    assert(insert(ins, leaflist) === List(Leaf('e', 1), Leaf('t', 2), Leaf('x', 4), ins))
+  }
+
   test("combine of some leaf list") {
     val leaflist = List(Leaf('e', 1), Leaf('t', 2), Leaf('x', 4))
     assert(combine(leaflist) === List(Fork(Leaf('e',1),Leaf('t',2),List('e', 't'),3), Leaf('x',4)))
