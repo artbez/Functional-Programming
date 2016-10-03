@@ -1,0 +1,1 @@
+multTable n = map (\j -> map (\i -> (i * j)) [1..n]) [1..n]
