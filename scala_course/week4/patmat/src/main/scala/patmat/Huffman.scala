@@ -255,9 +255,6 @@ object Huffman {
    */
     def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = {
       val table = convert(tree)
-      text match {
-        case List() => List()
-        case l1 :: ls => codeBits(table)(l1) ::: quickEncode(tree) (ls)
-      }
+      text.foldRight(List[Bit]()) ((x,y) => codeBits(table) (x) ::: y)
     }
   }
