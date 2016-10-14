@@ -1,0 +1,2 @@
+coins n = [[i, j, k] | let a = n `div` 2, i <- [a, (a - 1)..0], let b = (n - i * 2) `div` 3,
+      j <- [b, (b - 1)..0], let c = (n - i * 2 - j * 3) `div` 5, k <- [c, (c - 1)..0], i * 2 + j * 3 + k * 5 == n ]
