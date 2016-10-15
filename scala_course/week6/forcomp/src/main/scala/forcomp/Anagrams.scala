@@ -62,10 +62,10 @@ object Anagrams {
    *    List(('a', 1), ('e', 1), ('t', 1)) -> Seq("ate", "eat", "tea")
    *
    */
-  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = ???
+  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = dictionary groupBy(x => wordOccurrences(x)) toMap
 
   /** Returns all the anagrams of a given word. */
-  def wordAnagrams(word: Word): List[Word] = ???
+  def wordAnagrams(word: Word): List[Word] = dictionaryByOccurrences.getOrElse(wordOccurrences(word), List())
 
   /** Returns the list of all subsets of the occurrence list.
    *  This includes the occurrence itself, i.e. `List(('k', 1), ('o', 1))`
@@ -89,7 +89,16 @@ object Anagrams {
    *  Note that the order of the occurrence list subsets does not matter -- the subsets
    *  in the example above could have been displayed in some other order.
    */
-  def combinations(occurrences: Occurrences): List[Occurrences] = ???
+  def combinations(occurrences: Occurrences): List[Occurrences] = {
+    if (occurrences.isEmpty) (List(List()))
+    else {
+      val curRes = List() :: (for {
+        res <- combinations(occurrences.tail)
+        num <- 0 to occurrences.head._2} yield (occurrences.head._1, num) :: res).toList
+      curRes map (x => x.filter(elem => elem._2 != 0))
+    }
+
+  }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
    *
@@ -101,7 +110,14 @@ object Anagrams {
    *  Note: the resulting value is an occurrence - meaning it is sorted
    *  and has no zero-entries.
    */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = ???
+  def subtract(x: Occurrences, y: Occurrences): Occurrences = {
+    def mkUnordered(x: Occurrences, y: Occurrences): Occurrences = y match {
+      case Nil => x
+      case (ch, num) :: ys => mkUnordered((x filter (elem => elem._1 == ch) map (elem => (elem._1, elem._2 - num)) head)
+        :: x.filterNot(elem => elem._1 == ch), ys)
+    }
+    mkUnordered(x, y).filterNot(elem => elem._2 == 0).sorted
+  }
 
   /** Returns a list of all anagram sentences of the given sentence.
    *
